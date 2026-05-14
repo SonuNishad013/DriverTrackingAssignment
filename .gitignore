@@ -21,6 +21,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 **/.xcode.env.local
+Podfile.lock
+Pods/
 
 # Android/IntelliJ
 #
@@ -34,6 +36,12 @@ local.properties
 *.keystore
 !debug.keystore
 .kotlin/
+output-metadata.json
+DriverTrackerKeystore.jks
+gradle-daemon-jvm.properties
+app-release.dm
+DriverTracker.apk
+*.apk
 
 # node.js
 #
@@ -73,3 +81,8 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Project 
+.env
+app-release.apk
+android/app/release/

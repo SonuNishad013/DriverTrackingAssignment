@@ -1,97 +1,164 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# DriverTracker
 
-# Getting Started
+A React Native application for tracking drivers on a map, built with TypeScript and featuring real-time marker animations.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Project Setup
 
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
+This project was created using the React Native CLI:
 
 ```sh
-# Using npm
-npm start
+npx @react-native-community/cli init DriverTracker
+```
 
-# OR using Yarn
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 22.11.0
+- React Native development environment set up ([see guide](https://reactnative.dev/docs/set-up-your-environment))
+
+### Installation
+
+1. Install dependencies:
+
+```sh
+yarn install
+```
+
+2. For iOS, install CocoaPods dependencies:
+
+```sh
+yarn pod
+# or
+cd ios && pod install && cd ..
+```
+
+### Running the App
+
+1. Start Metro bundler:
+
+```sh
 yarn start
+# or
+npm start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+2. Run on Android:
 
 ```sh
-# Using npm
-npm run android
-
-# OR using Yarn
 yarn android
+# or
+npm run android
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+3. Run on iOS:
 
 ```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
 yarn ios
+# or
+npm run ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Dependencies
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+- `react-native-maps`: For displaying Google Maps and markers
+- `react-native-config`: For managing environment variables securely
+- `react-native-gesture-handler`: For gesture handling
+- `react-native-safe-area-context`: For safe area insets
 
-## Step 3: Modify your app
+## Google Maps API Setup
 
-Now that you have successfully run the app, let's make changes!
+### Obtaining API Key
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable the Maps SDK for Android and Maps SDK for iOS
+4. Create credentials (API Key)
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### Restricting API Key
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+For security, restrict the API key:
 
-## Congratulations! :tada:
+1. In Google Cloud Console, go to APIs & Services > Credentials
+2. Select your API key
+3. Under "Application restrictions":
+   - Choose "Android apps" and/or "iOS apps"
+   - Add your app's package name/bundle ID
+4. Under "API restrictions":
+   - Restrict to Maps SDK for Android and Maps SDK for iOS
 
-You've successfully run and modified your React Native App. :partying_face:
+### Storing API Key Securely
 
-### Now what?
+1. Create a `.env` file in the project root (already exists)
+2. Add your API key:
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+```
+GOOGLE_MAPS_API_KEY=your_api_key_here
+```
 
-# Troubleshooting
+3. The app uses `react-native-config` to access environment variables securely
+4. Add `.env` to `.gitignore` to prevent committing sensitive data
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## How the App Works
 
-# Learn More
+### Driver Data Generation
 
-To learn more about React Native, take a look at the following resources:
+- Driver data is generated randomly using utility functions in `src/utils/helper.tsx`
+- Each driver has:
+  - Unique ID and name
+  - Vehicle information (type and number plate)
+  - Trust score and rating
+  - Initial coordinates near a center location (Chandigarh area)
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Map and Markers
+
+- Uses `react-native-maps` with Google Maps provider
+- Displays animated markers for each driver
+- Markers use a custom taxi icon (`src/assets/Texi.png`)
+
+### Real-time Movement
+
+- Drivers' positions update every 2 seconds
+- Movement is simulated with small random coordinate changes
+- Uses `AnimatedRegion` for smooth marker animations
+- Animation duration: 1500ms for each move
+
+### Performance Optimizations
+
+- `tracksViewChanges={false}` on markers to prevent unnecessary re-renders
+- Driver data is memoized using `useMemo` hook
+- Limited to 12 drivers to maintain performance
+- Uses native animations with `useNativeDriver: false` for coordinate changes
+
+### Driver Details Display
+
+- Tapping a marker selects the driver
+- Shows a sliding card (`DriverCard` component) with:
+  - Driver photo and verification badge
+  - Trust score and rating
+  - Vehicle details
+- Card animates in from bottom with spring animation
+
+### Selected Marker Highlighting
+
+- When a driver is selected, the detail card appears
+- The selected driver's information is prominently displayed
+- Close button animates the card out and deselects the driver
+
+## Project Structure
+
+```
+src/
+  assets/          # Images and icons
+  components/      # Reusable components (DriverCard)
+  data/           # Driver data generation
+  screens/        # Main screens (MapScreen)
+  utils/          # Helper functions
+```
+
+## Development
+
+- Run tests: `yarn test`
+- Lint code: `yarn lint`
+- Format code: `npx prettier --write .`
+# DriverTrackingAssignment

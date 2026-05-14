@@ -2,6 +2,8 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import GoogleMaps
+import ReactNativeConfig
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -22,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeFactory = factory
 
     window = UIWindow(frame: UIScreen.main.bounds)
-
+    GMSServices.provideAPIKey( ReactNativeConfig.env(for: "GOOGLE_MAPS_API_KEY"))
     factory.startReactNative(
       withModuleName: "DriverTracker",
       in: window,
